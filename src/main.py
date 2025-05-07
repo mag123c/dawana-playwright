@@ -4,20 +4,20 @@ from src.infra.asynchronous.dawana_scraper import DanawaAsyncScraper
 from src.storage.file_storage import save_as_json
 
 categories = [
-    {
-        "group_code": "13",
-        "cate_name": "아이스박스",
-        "cate_code": "42018",
-        "ref_cate_code": "13342018",
-        "depth": "3",
-    },
-    {
-        "group_code": "13",
-        "cate_name": "쿨러백",
-        "cate_code": "42019",
-        "ref_cate_code": "13342019",
-        "depth": "3",
-    },
+    # {
+    #     "group_code": "13",
+    #     "cate_name": "아이스박스",
+    #     "cate_code": "42018",
+    #     "ref_cate_code": "13342018",
+    #     "depth": "3",
+    # },
+    # {
+    #     "group_code": "13",
+    #     "cate_name": "쿨러백",
+    #     "cate_code": "42019",
+    #     "ref_cate_code": "13342019",
+    #     "depth": "3",
+    # },
     {
         "group_code": "14",
         "cate_name": "차량용냉온냉장고",

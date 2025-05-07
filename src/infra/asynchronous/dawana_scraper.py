@@ -34,7 +34,7 @@ class DanawaAsyncScraper:
     async def scrape(self) -> List[Equipment]:
         url = "https://prod.danawa.com/list/ajax/getProductList.ajax.php"
         all_results: List[Equipment] = []
-        coupang_service = CoupangAsyncService(max_concurrency=5)
+        coupang_service = CoupangAsyncService(max_concurrency=3)
 
         async with async_playwright() as p:
             browser = await p.chromium.launch(headless=True)
@@ -111,11 +111,11 @@ class DanawaAsyncScraper:
                         #     pid = eq.id.replace("productItem", "")
                         #     eq.reviews = review_results.get(pid, [])
 
-                    # 4) 페이지별 쿠팡 URL 병렬 매칭
-                    equipment_page = await coupang_service.attach_urls(equipment_list)
+                        # 4) 페이지별 쿠팡 URL 병렬 매칭
+                        equipment_page = await coupang_service.attach_urls(equipment_list)
 
-                    # 5) 결과 누적
-                    all_results.extend(equipment_page)
+                        # 5) 결과 누적
+                        all_results.extend(equipment_page)
 
             finally:
                 await page.close()

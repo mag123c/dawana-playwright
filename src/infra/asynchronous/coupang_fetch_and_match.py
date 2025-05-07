@@ -16,14 +16,13 @@ class CoupangHtmlFetcher:
     async def fetch_html(self) -> str:
         async with async_playwright() as p:
             browser = await p.chromium.launch(
-                headless=True,
+                headless=False,
                 args=[
                     '--disable-web-security',
                     '--disable-http2',                                    # HTTP/2 비활성화
                     '--disable-quic',                                     # QUIC 비활성화
                     '--disable-features=NetworkService,NetworkServiceInProcess',  
                     '--disable-blink-features=AutomationControlled',      # 자동화 탐지 차단
-                    '--window-size=1920,1080',                            # 창 크기 명시
                     '--no-sandbox',
                     '--disable-dev-shm-usage',
                     '--lang=ko'
@@ -31,7 +30,6 @@ class CoupangHtmlFetcher:
             )
 
             context = await browser.new_context(
-                viewport={"width": 1920, "height": 1080},
                 locale="ko-KR",
                 timezone_id="Asia/Seoul",
                 permissions=["geolocation"],
@@ -62,19 +60,26 @@ class CoupangHtmlFetcher:
             url = f"{self.BASE_URL}{self.keyword}"
             print(f"🔍 요청 URL: {url}")
 
-            await page.set_viewport_size({"width": 1920, "height": 1080})
-            response = await page.goto(url, timeout=60000, wait_until="domcontentloaded")
-            if response.status != 200:
-                print(f"❌ 페이지 요청 실패: {response.status}")
+            try:
+                response = await page.goto(url, timeout=60000, wait_until="domcontentloaded")
+                if not response or response.status != 200:
+                    print(f"❌ [GOTO 실패] URL: {url} | 응답 없음 또는 상태코드 {response.status}")
+                    return ""
+
+                # 페이지 로딩 대기
+                await page.wait_for_selector('ul.search-product-list', timeout=60000)
+
+                html = await page.content()
                 await browser.close()
+                return html   
+
+            except PlaywrightTimeoutError:
+                print(f"⏰ [타임아웃] URL: {url} | 60초 이내 응답 없음. 다음 키워드로 스킵합니다.")
                 return ""
 
-            # 페이지 로딩 대기
-            await page.wait_for_selector('ul.search-product-list', timeout=60000)
-
-            html = await page.content()
-            await browser.close()
-            return html   
+            except Exception as e:
+                print(f"🔥 [예외 발생] {type(e).__name__}: {e}")
+                return ""
 
 
 
